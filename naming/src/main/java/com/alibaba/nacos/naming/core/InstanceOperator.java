@@ -35,17 +35,18 @@ public interface InstanceOperator {
     
     /**
      * Register an instance to a service in AP mode.
-     *
+     * 处理注册实例请求
      * @param namespaceId id of namespace
      * @param serviceName grouped service name group@@service
      * @param instance    instance to register
      * @throws NacosException nacos exception when register failed
      */
+
     void registerInstance(String namespaceId, String serviceName, Instance instance) throws NacosException;
     
     /**
      * Remove instance from service.
-     *
+     * 处理删除实例请求
      * @param namespaceId namespace
      * @param serviceName grouped service name group@@service
      * @param instance    instance
@@ -56,7 +57,7 @@ public interface InstanceOperator {
     /**
      * Update instance information. Due to the basic information can't be changed, so this update should only update
      * metadata.
-     *
+     * 处理更新实例请求
      * <p>Update API will replace the whole metadata with new input instance.
      *
      * @param namespaceId namespace

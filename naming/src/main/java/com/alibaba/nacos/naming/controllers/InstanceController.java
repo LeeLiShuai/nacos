@@ -64,7 +64,7 @@ import static com.alibaba.nacos.naming.misc.UtilsAndCommons.DEFAULT_CLUSTER_NAME
 
 /**
  * Instance operation controller.
- *
+ * 实例相关操作
  * @author nkorange
  */
 @RestController
@@ -85,11 +85,10 @@ public class InstanceController {
     
     /**
      * Register new instance.
-     *
+     * 实例注册
      * @param request http request
      * @return 'ok' if success
      * @throws Exception any error during register
-     * 实例注册
      */
     @CanDistro
     @PostMapping
@@ -109,7 +108,7 @@ public class InstanceController {
     
     /**
      * Deregister instances.
-     *
+     * 实例下线
      * @param request http request
      * @return 'ok' if success
      * @throws Exception any error during deregister
@@ -129,7 +128,7 @@ public class InstanceController {
     
     /**
      * Update instance.
-     *
+     * 实例更新
      * @param request http request
      * @return 'ok' if success
      * @throws Exception any error during update

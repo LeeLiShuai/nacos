@@ -26,16 +26,18 @@ import java.util.HashSet;
 
 /**
  * Naming subscriber service for local.
- *
+ * 本地的服务订阅服务
  * @author xiweng.yy
  * @deprecated Will be removed with {@link com.alibaba.nacos.naming.push.v1.NamingSubscriberServiceV1Impl}
  */
 @org.springframework.stereotype.Service
 @Deprecated
 public class NamingSubscriberServiceLocalImpl implements NamingSubscriberService {
-    
+
+    //v1版本
     private final NamingSubscriberServiceV1Impl namingSubscriberServiceV1;
-    
+
+    //v2版本
     private final NamingSubscriberServiceV2Impl namingSubscriberServiceV2;
     
     public NamingSubscriberServiceLocalImpl(NamingSubscriberServiceV1Impl namingSubscriberServiceV1,

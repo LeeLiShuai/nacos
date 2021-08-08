@@ -633,7 +633,7 @@ public class ServiceManager implements RecordListener<Service> {
     
     /**
      * Add instance to service.
-     *
+     * 向service中添加实例
      * @param namespaceId namespace
      * @param serviceName service name
      * @param ephemeral   whether instance is ephemeral
@@ -642,17 +642,16 @@ public class ServiceManager implements RecordListener<Service> {
      */
     public void addInstance(String namespaceId, String serviceName, boolean ephemeral, Instance... ips)
             throws NacosException {
-        
         String key = KeyBuilder.buildInstanceListKey(namespaceId, serviceName, ephemeral);
-        
+        //获取对应的service
         Service service = getService(namespaceId, serviceName);
-        
+        //同步操作
         synchronized (service) {
+            //新增
             List<Instance> instanceList = addIpAddresses(service, ephemeral, ips);
-            
+            //同步数据到consistencyService
             Instances instances = new Instances();
             instances.setInstanceList(instanceList);
-            
             consistencyService.put(key, instances);
         }
     }
@@ -805,16 +804,20 @@ public class ServiceManager implements RecordListener<Service> {
                         .warn("cluster: {} not found, ip: {}, will create new cluster with default configuration.",
                                 instance.getClusterName(), instance.toJson());
             }
-            
+            //移除
             if (UtilsAndCommons.UPDATE_INSTANCE_ACTION_REMOVE.equals(action)) {
                 instanceMap.remove(instance.getDatumKey());
             } else {
+                //不是移除，获取老的实例信息，然后更新
                 Instance oldInstance = instanceMap.get(instance.getDatumKey());
                 if (oldInstance != null) {
+                    //更新
                     instance.setInstanceId(oldInstance.getInstanceId());
                 } else {
+                    //新增
                     instance.setInstanceId(instance.generateInstanceId(currentInstanceIds));
                 }
+                //更新instanceMap
                 instanceMap.put(instance.getDatumKey(), instance);
             }
             

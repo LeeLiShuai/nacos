@@ -29,7 +29,7 @@ import java.util.HashSet;
 
 /**
  * Client manager delegate.
- *
+ * 客户端管理代表，内部包含代理的所有实现
  * @author xiweng.yy
  */
 @Component("clientManager")

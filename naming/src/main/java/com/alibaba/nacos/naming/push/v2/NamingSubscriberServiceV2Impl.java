@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 
 /**
  * Naming subscriber service for v2.x.
- *
+ * v2版本的订阅者service实现
  * @author xiweng.yy
  */
 @org.springframework.stereotype.Service
@@ -75,6 +75,7 @@ public class NamingSubscriberServiceV2Impl extends SmartSubscriber implements Na
     
     @Override
     public Collection<Subscriber> getSubscribers(String namespaceId, String serviceName) {
+        //用serviceName构建service实例然后调用重载方法
         String serviceNameWithoutGroup = NamingUtils.getServiceName(serviceName);
         String groupName = NamingUtils.getGroupName(serviceName);
         Service service = Service.newService(namespaceId, groupName, serviceNameWithoutGroup);
@@ -84,6 +85,7 @@ public class NamingSubscriberServiceV2Impl extends SmartSubscriber implements Na
     @Override
     public Collection<Subscriber> getSubscribers(Service service) {
         Collection<Subscriber> result = new HashSet<>();
+        //调用ClientServiceIndexesManager。获取某个service的所有实例的列表。然后获取每一个实例的订阅者
         for (String each : indexesManager.getAllClientsSubscribeService(service)) {
             result.add(clientManager.getClient(each).getSubscriber(service));
         }
@@ -96,6 +98,7 @@ public class NamingSubscriberServiceV2Impl extends SmartSubscriber implements Na
         Stream<Service> serviceStream = getServiceStream();
         String serviceNamePattern = NamingUtils.getServiceName(serviceName);
         String groupNamePattern = NamingUtils.getGroupName(serviceName);
+        //所有有订阅者的service过滤然后添加到结果中
         serviceStream.filter(service -> service.getNamespace().equals(namespaceId) && service.getName()
                 .contains(serviceNamePattern) && service.getGroup().contains(groupNamePattern))
                 .forEach(service -> result.addAll(getSubscribers(service)));
@@ -135,7 +138,9 @@ public class NamingSubscriberServiceV2Impl extends SmartSubscriber implements Na
     }
     
     private Stream<Service> getServiceStream() {
+        //有订阅者的服务的集合
         Collection<Service> services = indexesManager.getSubscribedService();
+        //大于100返回并发的stream，否则返回普通的stream
         return services.size() > PARALLEL_SIZE ? services.parallelStream() : services.stream();
     }
 }

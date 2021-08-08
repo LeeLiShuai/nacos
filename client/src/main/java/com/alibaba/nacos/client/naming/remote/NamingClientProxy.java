@@ -35,7 +35,7 @@ public interface NamingClientProxy extends Closeable {
     
     /**
      * Register a instance to service with specified instance properties.
-     *
+     * 注册实例
      * @param serviceName name of service
      * @param groupName   group of service
      * @param instance    instance to register

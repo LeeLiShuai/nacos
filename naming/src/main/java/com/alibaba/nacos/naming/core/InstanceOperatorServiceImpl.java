@@ -100,13 +100,6 @@ public class InstanceOperatorServiceImpl implements InstanceOperator {
         this.subscriberServiceV1 = subscriberServiceV1;
     }
 
-    /**
-     * 服务端处理注册实例请求
-     * @param namespaceId id of namespace
-     * @param serviceName grouped service name group@@service
-     * @param instance    instance to register
-     * @throws NacosException
-     */
     @Override
     public void registerInstance(String namespaceId, String serviceName, Instance instance) throws NacosException {
         com.alibaba.nacos.naming.core.Instance coreInstance = (com.alibaba.nacos.naming.core.Instance) instance;

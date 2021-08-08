@@ -30,7 +30,7 @@ public interface NamingSubscriberService {
     
     /**
      * Get all push target subscribers for specified service.
-     *
+     *  根据namespace和service搜索订阅者
      * @param namespaceId namespace id
      * @param serviceName service name
      * @return list of subsribers
@@ -39,7 +39,7 @@ public interface NamingSubscriberService {
     
     /**
      * Get all push target subscribers for specified service.
-     *
+     * 根据service搜索订阅者
      * @param service {@link Service}
      * @return list of subsribers
      */
@@ -47,7 +47,7 @@ public interface NamingSubscriberService {
     
     /**
      * Fuzzy get subscribers. Only support fuzzy serviceName.
-     *
+     * 根据namespace和service模糊搜索订阅者
      * <p>Warning: This method cost much performance, use less.
      *
      * @param namespaceId namespace id
@@ -58,7 +58,7 @@ public interface NamingSubscriberService {
     
     /**
      * Fuzzy get subscribers. Only support fuzzy serviceName.
-     *
+     * 根据service模糊搜索订阅者
      * <p>Warning: This method cost much performance, use less.
      *
      * @param service {@link Service}

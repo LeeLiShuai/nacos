@@ -35,14 +35,14 @@ import java.util.stream.Collectors;
 
 /**
  * Subscribe manager.
- *
+ * 订阅者管理
  * @author Nicholas
  * @author xiweng.yy
  * @since 1.0.1
  */
 @Service
 public class SubscribeManager {
-    
+
     @Autowired
     private NamingSubscriberServiceLocalImpl localService;
     
@@ -51,14 +51,15 @@ public class SubscribeManager {
     
     /**
      * Get subscribers.
-     *
+     * 获取订阅者列表
      * @param serviceName service name
      * @param namespaceId namespace id
-     * @param aggregation aggregation
+     * @param aggregation aggregation 默认为TRUE
      * @return list of subscriber
      */
     public List<Subscriber> getSubscribers(String serviceName, String namespaceId, boolean aggregation) {
         if (aggregation) {
+            //根据namespace和service模糊搜索
             Collection<Subscriber> result = aggregationService.getFuzzySubscribers(namespaceId, serviceName);
             return CollectionUtils.isNotEmpty(result) ? result.stream().filter(distinctByKey(Subscriber::toString))
                     .collect(Collectors.toList()) : Collections.EMPTY_LIST;

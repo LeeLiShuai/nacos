@@ -59,12 +59,13 @@ public class NamingMetadataOperateService {
         WriteRequest operationLog = WriteRequest.newBuilder().setGroup(Constants.SERVICE_METADATA)
                 .setOperation(DataOperation.CHANGE.name()).setData(ByteString.copyFrom(serializer.serialize(operation)))
                 .build();
+        //提交元数据
         submitMetadataOperation(operationLog);
     }
     
     /**
      * Delete service metadata.
-     *
+     * 删除服务元数据
      * @param service service of metadata
      */
     public void deleteServiceMetadata(Service service) {
@@ -77,7 +78,7 @@ public class NamingMetadataOperateService {
     
     /**
      * Update instance metadata.
-     *
+     * 更新实例元数据
      * @param service          service of metadata
      * @param metadataId       instance metadataId Id
      * @param instanceMetadata metadata
@@ -94,7 +95,7 @@ public class NamingMetadataOperateService {
     
     /**
      * Delete instance metadata.
-     *
+     * 删除实例元数据
      * @param service    service of metadata
      * @param metadataId instance metadata Id
      */
@@ -109,7 +110,7 @@ public class NamingMetadataOperateService {
     
     /**
      * Add cluster metadata to service metadata.
-     *
+     * 添加集群元数据到某个服务的元数据
      * @param service         service
      * @param clusterName     cluster name
      * @param clusterMetadata cluster metadata

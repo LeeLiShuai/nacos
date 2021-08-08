@@ -37,14 +37,16 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Client and service index manager.
- *
+ * 客户端和服务的关系关系
  * @author xiweng.yy
  */
 @Component
 public class ClientServiceIndexesManager extends SmartSubscriber {
-    
+
+    //服务的提供方
     private final ConcurrentMap<Service, Set<String>> publisherIndexes = new ConcurrentHashMap<>();
-    
+
+    //服务订阅者
     private final ConcurrentMap<Service, Set<String>> subscriberIndexes = new ConcurrentHashMap<>();
     
     public ClientServiceIndexesManager() {
