@@ -63,10 +63,12 @@ public class ServiceOperatorV2Impl implements ServiceOperator {
     @Override
     public void create(String namespaceId, String serviceName, ServiceMetadata metadata) throws NacosException {
         Service service = getServiceFromGroupedServiceName(namespaceId, serviceName, metadata.isEphemeral());
+        //判断是否存在
         if (ServiceManager.getInstance().containSingleton(service)) {
             throw new NacosException(NacosException.INVALID_PARAM,
                     String.format("specified service %s already exists!", service.getGroupedServiceName()));
         }
+        //更新服务元数据
         metadataOperateService.updateServiceMetadata(service, metadata);
     }
     
@@ -147,7 +149,14 @@ public class ServiceOperatorV2Impl implements ServiceOperator {
         }
         return result;
     }
-    
+
+    /**
+     * 根据参数构建一个新的service
+     * @param namespaceId
+     * @param groupedServiceName
+     * @param ephemeral
+     * @return
+     */
     private Service getServiceFromGroupedServiceName(String namespaceId, String groupedServiceName, boolean ephemeral) {
         String groupName = NamingUtils.getGroupName(groupedServiceName);
         String serviceName = NamingUtils.getServiceName(groupedServiceName);

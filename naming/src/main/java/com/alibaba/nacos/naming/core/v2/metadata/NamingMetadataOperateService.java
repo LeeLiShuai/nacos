@@ -49,7 +49,7 @@ public class NamingMetadataOperateService {
     
     /**
      * Update service metadata.
-     *
+     * 更新服务元数据
      * @param service         service of metadata
      * @param serviceMetadata metadata
      */

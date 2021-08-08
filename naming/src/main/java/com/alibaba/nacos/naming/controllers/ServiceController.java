@@ -92,7 +92,7 @@ public class ServiceController {
     
     /**
      * Create a new service. This API will create a persistence service.
-     *
+     * 新建service
      * @param namespaceId      namespace id
      * @param serviceName      service name
      * @param protectThreshold protect threshold
@@ -119,7 +119,7 @@ public class ServiceController {
     
     /**
      * Remove service.
-     *
+     * 删除一个service
      * @param namespaceId namespace
      * @param serviceName service name
      * @return 'ok' if success
@@ -136,7 +136,7 @@ public class ServiceController {
     
     /**
      * Get detail of service.
-     *
+     * 获取service详情
      * @param namespaceId namespace
      * @param serviceName service name
      * @return detail information of service
@@ -151,7 +151,7 @@ public class ServiceController {
     
     /**
      * List all service names.
-     *
+     * service列表
      * @param request http request
      * @return all service names
      * @throws Exception exception
@@ -176,7 +176,7 @@ public class ServiceController {
     
     /**
      * Update service.
-     *
+     * 更新service
      * @param request http request
      * @return 'ok' if success
      * @throws Exception exception
@@ -200,7 +200,7 @@ public class ServiceController {
     
     /**
      * Search service names.
-     *
+     * 查询service
      * @param namespaceId     namespace
      * @param expr            search pattern
      * @param responsibleOnly whether only search responsible service
@@ -232,7 +232,7 @@ public class ServiceController {
     
     /**
      * Check service status whether latest.
-     *
+     * 检查service的状态是否最新
      * @param request http request
      * @return 'ok' if service status if latest, otherwise 'fail' or exception
      * @throws Exception exception

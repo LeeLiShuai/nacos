@@ -70,7 +70,7 @@ public class CatalogController {
     
     /**
      * Get service detail.
-     *
+     * 获取某个服务的详情
      * @param namespaceId namespace id
      * @param serviceName service name
      * @return service detail information
@@ -87,7 +87,7 @@ public class CatalogController {
     
     /**
      * List instances of special service.
-     *
+     * 某个服务的实例列表
      * @param namespaceId namespace id
      * @param serviceName service name
      * @param clusterName cluster name
@@ -129,7 +129,7 @@ public class CatalogController {
     
     /**
      * List service detail information.
-     *
+     * 服务列表
      * @param withInstances     whether return instances
      * @param namespaceId       namespace id
      * @param pageNo            number of page

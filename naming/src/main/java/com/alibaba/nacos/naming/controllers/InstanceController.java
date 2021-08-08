@@ -89,19 +89,20 @@ public class InstanceController {
      * @param request http request
      * @return 'ok' if success
      * @throws Exception any error during register
+     * 实例注册
      */
     @CanDistro
     @PostMapping
     @Secured(parser = NamingResourceParser.class, action = ActionTypes.WRITE)
     public String register(HttpServletRequest request) throws Exception {
-        
+        //获取namespce,serviceName
         final String namespaceId = WebUtils
                 .optional(request, CommonParams.NAMESPACE_ID, Constants.DEFAULT_NAMESPACE_ID);
         final String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);
         NamingUtils.checkServiceNameFormat(serviceName);
-        
+        //构建实例信息
         final Instance instance = parseInstance(request);
-        
+        //注册实例
         getInstanceOperator().registerInstance(namespaceId, serviceName, instance);
         return "ok";
     }

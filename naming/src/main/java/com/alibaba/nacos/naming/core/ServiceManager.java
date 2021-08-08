@@ -489,15 +489,16 @@ public class ServiceManager implements RecordListener<Service> {
      * @param serviceName service name
      * @param instance    instance to register
      * @throws Exception any error occurred in the process
+     * 新实例注册
      */
     public void registerInstance(String namespaceId, String serviceName, Instance instance) throws NacosException {
-        
+        //没有此service就新建service
         createEmptyService(namespaceId, serviceName, instance.isEphemeral());
-        
+        //获取对应service
         Service service = getService(namespaceId, serviceName);
-        
+        //检验service
         checkServiceIsNull(service, namespaceId, serviceName);
-        
+        //添加service
         addInstance(namespaceId, serviceName, instance.isEphemeral(), instance);
     }
     
