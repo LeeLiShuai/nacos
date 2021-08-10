@@ -27,15 +27,17 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default share event publisher implementation for slow event.
- *
+ * 多事件发布者，可以处理多种事件类型
  * @author zongtanghu
  */
 public class DefaultSharePublisher extends DefaultPublisher implements ShardedEventPublisher {
-    
+    /**
+     *  保存事件类型与订阅者的对应关系
+     */
     private final Map<Class<? extends SlowEvent>, Set<Subscriber>> subMappings = new ConcurrentHashMap<>();
     
     private final Lock lock = new ReentrantLock();
-    
+
     @Override
     public void addSubscriber(Subscriber subscriber, Class<? extends Event> subscribeType) {
         // Actually, do a classification based on the slowEvent type.
@@ -76,12 +78,17 @@ public class DefaultSharePublisher extends DefaultPublisher implements ShardedEv
             lock.unlock();
         }
     }
-    
+
+    /**
+     * 重写DefaultPublisher的方法
+     * @param event {@link Event}.
+     */
     @Override
     public void receiveEvent(Event event) {
         
         final long currentEventSequence = event.sequence();
         // get subscriber set based on the slow EventType.
+        //获取对应事件类型的订阅者。后续和Default的逻辑一样
         final Class<? extends SlowEvent> slowEventType = (Class<? extends SlowEvent>) event.getClass();
         
         // Get for Map, the algorithm is O(1).

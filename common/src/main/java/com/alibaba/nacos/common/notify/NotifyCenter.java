@@ -38,30 +38,52 @@ import static com.alibaba.nacos.api.exception.NacosException.SERVER_ERROR;
 
 /**
  * Unified Event Notify Center.
- *
+ * 统一事件通知中心
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  * @author zongtanghu
  */
 public class NotifyCenter {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyCenter.class);
-    
+
+    /**
+     * 单事件发布者队列的默认容量
+     */
     public static int ringBufferSize;
-    
+
+    /**
+     * 多时间发布者队列的默认容量
+     */
     public static int shareBufferSize;
-    
+
+    /**
+     * 是否已关闭
+     */
     private static final AtomicBoolean CLOSED = new AtomicBoolean(false);
-    
+
+    /**
+     * 事件发布者工厂
+     */
     private static final EventPublisherFactory DEFAULT_PUBLISHER_FACTORY;
-    
+
+    /**
+     * 通知中心实例
+     */
     private static final NotifyCenter INSTANCE = new NotifyCenter();
-    
+
+    /**
+     * 多事件发布者
+     */
     private DefaultSharePublisher sharePublisher;
-    
+
+    /**
+     * 单事件发布者类型
+     */
     private static Class<? extends EventPublisher> clazz;
     
     /**
      * Publisher management container.
+     * 事件发布者储存容器
      */
     private final Map<String, EventPublisher> publisherMap = new ConcurrentHashMap<>(16);
     
@@ -156,7 +178,7 @@ public class NotifyCenter {
     /**
      * Register a Subscriber. If the Publisher concerned by the Subscriber does not exist, then PublihserMap will
      * preempt a placeholder Publisher with default EventPublisherFactory first.
-     *
+     * 注册一个订阅者
      * @param consumer subscriber
      */
     public static void registerSubscriber(final Subscriber consumer) {
@@ -166,20 +188,24 @@ public class NotifyCenter {
     /**
      * Register a Subscriber. If the Publisher concerned by the Subscriber does not exist, then PublihserMap will
      * preempt a placeholder Publisher with specified EventPublisherFactory first.
-     *
+     * 注册一个订阅者
      * @param consumer subscriber
      * @param factory  publisher factory.
      */
     public static void registerSubscriber(final Subscriber consumer, final EventPublisherFactory factory) {
         // If you want to listen to multiple events, you do it separately,
         // based on subclass's subscribeTypes method return list, it can register to publisher.
+        //多事件订阅者
         if (consumer instanceof SmartSubscriber) {
+            //获取订阅的事件类型
             for (Class<? extends Event> subscribeType : ((SmartSubscriber) consumer).subscribeTypes()) {
                 // For case, producer: defaultSharePublisher -> consumer: smartSubscriber.
+                //订阅类型是多事件类型的子类
                 if (ClassUtils.isAssignableFrom(SlowEvent.class, subscribeType)) {
                     INSTANCE.sharePublisher.addSubscriber(consumer, subscribeType);
                 } else {
                     // For case, producer: defaultPublisher -> consumer: subscriber.
+                    //添加单一事件类型订阅者
                     addSubscriber(consumer, subscribeType, factory);
                 }
             }
@@ -191,13 +217,13 @@ public class NotifyCenter {
             INSTANCE.sharePublisher.addSubscriber(consumer, subscribeType);
             return;
         }
-        
+        //添加单一事件类型订阅者
         addSubscriber(consumer, subscribeType, factory);
     }
     
     /**
      * Add a subscriber to publisher.
-     *
+     * 添加订阅者订阅某一类型事件
      * @param consumer      subscriber instance.
      * @param subscribeType subscribeType.
      * @param factory       publisher factory.
@@ -207,10 +233,13 @@ public class NotifyCenter {
         
         final String topic = ClassUtils.getCanonicalName(subscribeType);
         synchronized (NotifyCenter.class) {
+            //逻辑同Map.computeIfAbsent
             // MapUtils.computeIfAbsent is a unsafe method.
             MapUtil.computeIfAbsent(INSTANCE.publisherMap, topic, factory, subscribeType, ringBufferSize);
         }
+        //获取对应的发布者
         EventPublisher publisher = INSTANCE.publisherMap.get(topic);
+        //添加订阅者到发布者
         if (publisher instanceof ShardedEventPublisher) {
             ((ShardedEventPublisher) publisher).addSubscriber(consumer, subscribeType);
         } else {
@@ -272,7 +301,7 @@ public class NotifyCenter {
     /**
      * Request publisher publish event Publishers load lazily, calling publisher. Start () only when the event is
      * actually published.
-     *
+     * 发布事件
      * @param event class Instances of the event.
      */
     public static boolean publishEvent(final Event event) {
@@ -286,17 +315,17 @@ public class NotifyCenter {
     
     /**
      * Request publisher publish event Publishers load lazily, calling publisher.
-     *
+     * 发布事件
      * @param eventType class Instances type of the event type.
      * @param event     event instance.
      */
     private static boolean publishEvent(final Class<? extends Event> eventType, final Event event) {
+        //如果是多事件类型
         if (ClassUtils.isAssignableFrom(SlowEvent.class, eventType)) {
             return INSTANCE.sharePublisher.publish(event);
         }
-        
+        //单事件类型
         final String topic = ClassUtils.getCanonicalName(eventType);
-        
         EventPublisher publisher = INSTANCE.publisherMap.get(topic);
         if (publisher != null) {
             return publisher.publish(event);
@@ -327,7 +356,7 @@ public class NotifyCenter {
     
     /**
      * Register publisher with specified factory.
-     *
+     * 指定发布者工厂的添加发布者方法
      * @param eventType    class Instances type of the event type.
      * @param factory      publisher factory.
      * @param queueMaxSize the publisher's queue max size.

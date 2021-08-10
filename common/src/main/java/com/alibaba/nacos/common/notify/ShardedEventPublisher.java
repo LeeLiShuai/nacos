@@ -29,7 +29,7 @@ public interface ShardedEventPublisher extends EventPublisher {
     
     /**
      * Add listener for default share publisher.
-     *
+     * 添加订阅者和对应的事件类型
      * @param subscriber    {@link Subscriber}
      * @param subscribeType subscribe event type, such as slow event or general event.
      */

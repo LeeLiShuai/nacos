@@ -33,7 +33,7 @@ import java.util.concurrent.Executor;
 
 /**
  * Event publisher for naming event.
- *
+ * 命名事件的发布者
  * @author xiweng.yy
  */
 public class NamingEventPublisher extends Thread implements ShardedEventPublisher {
@@ -105,7 +105,12 @@ public class NamingEventPublisher extends Thread implements ShardedEventPublishe
         }
         return true;
     }
-    
+
+    /**
+     * 通知订阅者
+     * @param subscriber {@link Subscriber}
+     * @param event      {@link Event}
+     */
     @Override
     public void notifySubscriber(Subscriber subscriber, Event event) {
         if (Loggers.EVT_LOG.isDebugEnabled()) {
@@ -162,7 +167,11 @@ public class NamingEventPublisher extends Thread implements ShardedEventPublishe
             }
         }
     }
-    
+
+    /**
+     * 处理事件
+     * @param event
+     */
     private void handleEvent(Event event) {
         Class<? extends Event> eventType = event.getClass();
         Set<Subscriber<? extends Event>> subscribers = subscribes.get(eventType);
