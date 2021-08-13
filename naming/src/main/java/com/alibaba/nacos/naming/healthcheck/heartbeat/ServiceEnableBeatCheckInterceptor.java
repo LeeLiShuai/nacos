@@ -25,7 +25,7 @@ import java.util.Optional;
 
 /**
  * Service enable beat check interceptor.
- *
+ * service的心跳检测是否开启
  * @author xiweng.yy
  */
 public class ServiceEnableBeatCheckInterceptor extends AbstractBeatCheckInterceptor {
@@ -39,7 +39,11 @@ public class ServiceEnableBeatCheckInterceptor extends AbstractBeatCheckIntercep
         }
         return false;
     }
-    
+
+    /**
+     * 最高优先级
+     * @return
+     */
     @Override
     public int order() {
         return Integer.MIN_VALUE;

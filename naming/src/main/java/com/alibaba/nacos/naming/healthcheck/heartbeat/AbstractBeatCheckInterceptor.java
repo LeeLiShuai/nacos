@@ -20,7 +20,7 @@ import com.alibaba.nacos.naming.interceptor.NacosNamingInterceptor;
 
 /**
  * Abstract Beat check Interceptor.
- *
+ * 抽象的心跳监测拦截器，只拦截InstanceBeatCheckTask的子类
  * @author xiweng.yy
  */
 public abstract class AbstractBeatCheckInterceptor implements NacosNamingInterceptor<InstanceBeatCheckTask> {

@@ -27,11 +27,16 @@ import java.util.Optional;
 
 /**
  * Instance enable beat check interceptor.
- *
+ * 监测是否开启了心跳监测的拦截器
  * @author xiweng.yy
  */
 public class InstanceEnableBeatCheckInterceptor extends AbstractBeatCheckInterceptor {
-    
+
+    /**
+     * 判断是否开启了心跳检测
+     * @param object need intercepted object
+     * @return
+     */
     @Override
     public boolean intercept(InstanceBeatCheckTask object) {
         NamingMetadataManager metadataManager = ApplicationUtils.getBean(NamingMetadataManager.class);
@@ -45,7 +50,11 @@ public class InstanceEnableBeatCheckInterceptor extends AbstractBeatCheckInterce
         }
         return false;
     }
-    
+
+    /**
+     * 优先级第二高
+     * @return
+     */
     @Override
     public int order() {
         return Integer.MIN_VALUE + 1;

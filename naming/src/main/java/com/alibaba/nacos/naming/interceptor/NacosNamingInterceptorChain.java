@@ -18,21 +18,21 @@ package com.alibaba.nacos.naming.interceptor;
 
 /**
  * Nacos naming interceptor chain.
- *
+ * 拦截链
  * @author xiweng.yy
  */
 public interface NacosNamingInterceptorChain<T extends Interceptable> {
     
     /**
      * Add interceptor.
-     *
+     * 添加拦截器
      * @param interceptor interceptor
      */
     void addInterceptor(NacosNamingInterceptor<T> interceptor);
     
     /**
      * Do intercept by added interceptors.
-     *
+     * 执行拦截操作
      * @param object be interceptor object
      */
     void doInterceptor(T object);

@@ -26,12 +26,21 @@ import com.alibaba.nacos.sys.utils.ApplicationUtils;
  * @author xiweng.yy
  */
 public class HealthCheckResponsibleInterceptor extends AbstractHealthCheckInterceptor {
-    
+
+    /**
+     * 判断任务是否由当前拦截器处理
+     * @param object need intercepted object
+     * @return
+     */
     @Override
     public boolean intercept(NacosHealthCheckTask object) {
         return !ApplicationUtils.getBean(DistroMapper.class).responsible(object.getTaskId());
     }
-    
+
+    /**
+     * 优先级第二高
+     * @return
+     */
     @Override
     public int order() {
         return Integer.MIN_VALUE + 1;

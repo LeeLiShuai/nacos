@@ -29,7 +29,7 @@ import com.alibaba.nacos.naming.misc.UtilsAndCommons;
 
 /**
  * Thread to update ephemeral instance triggered by client beat for v2.x.
- *
+ * 用于更新由v2 client 心跳触发的ephemeral实例的线程
  * @author nkorange
  */
 public class ClientBeatProcessorV2 implements BeatProcessor {
@@ -51,16 +51,19 @@ public class ClientBeatProcessorV2 implements BeatProcessor {
         if (Loggers.EVT_LOG.isDebugEnabled()) {
             Loggers.EVT_LOG.debug("[CLIENT-BEAT] processing beat: {}", rsInfo.toString());
         }
+        //组装实例
         String ip = rsInfo.getIp();
         int port = rsInfo.getPort();
         String serviceName = NamingUtils.getServiceName(rsInfo.getServiceName());
         String groupName = NamingUtils.getGroupName(rsInfo.getServiceName());
         Service service = Service.newService(namespace, groupName, serviceName, rsInfo.isEphemeral());
         HealthCheckInstancePublishInfo instance = (HealthCheckInstancePublishInfo) client.getInstancePublishInfo(service);
+        //属于当前实例才处理
         if (instance.getIp().equals(ip) && instance.getPort() == port) {
             if (Loggers.EVT_LOG.isDebugEnabled()) {
                 Loggers.EVT_LOG.debug("[CLIENT-BEAT] refresh beat: {}", rsInfo);
             }
+            //设置为健康，并发布事件
             instance.setLastHeartBeatTime(System.currentTimeMillis());
             if (!instance.isHealthy()) {
                 instance.setHealthy(true);

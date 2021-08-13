@@ -25,11 +25,13 @@ public interface Interceptable {
     
     /**
      * If no {@link NacosNamingInterceptor} intercept this object, this method will be called to execute.
+     * 不被拦截执行的操作
      */
     void passIntercept();
     
     /**
      * If one {@link NacosNamingInterceptor} intercept this object, this method will be called.
+     * 拦截之后执行
      */
     void afterIntercept();
 }

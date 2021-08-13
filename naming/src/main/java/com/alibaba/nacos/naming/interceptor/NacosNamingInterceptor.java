@@ -18,14 +18,14 @@ package com.alibaba.nacos.naming.interceptor;
 
 /**
  * Nacos naming interceptor.
- *
+ * naming相关的拦截器
  * @author xiweng.yy
  */
 public interface NacosNamingInterceptor<T extends Interceptable> {
     
     /**
      * Judge whether the input type is intercepted by this Interceptor.
-     *
+     * 根据传入类型判断是否要处理
      * <p>This method only should judge the object type whether need be do intercept. Not the intercept logic.
      *
      * @param type type
@@ -35,7 +35,7 @@ public interface NacosNamingInterceptor<T extends Interceptable> {
     
     /**
      * Do intercept operation.
-     *
+     * 执行拦截操作
      * <p>This method is the actual intercept operation.
      *
      * @param object need intercepted object
@@ -45,7 +45,7 @@ public interface NacosNamingInterceptor<T extends Interceptable> {
     
     /**
      * The order of interceptor. The lower the number, the earlier the execution.
-     *
+     * 排序，数字越小，优先级越高
      * @return the order number of interceptor
      */
     int order();

@@ -20,7 +20,7 @@ import com.alibaba.nacos.naming.interceptor.Interceptable;
 
 /**
  * Nacos health check task.
- *
+ * 健康检查任务接口
  * @author xiweng.yy
  */
 public interface NacosHealthCheckTask extends Interceptable, Runnable {
@@ -34,6 +34,7 @@ public interface NacosHealthCheckTask extends Interceptable, Runnable {
     
     /**
      * Do health check.
+     * 执行健康检查
      */
     void doHealthCheck();
 }

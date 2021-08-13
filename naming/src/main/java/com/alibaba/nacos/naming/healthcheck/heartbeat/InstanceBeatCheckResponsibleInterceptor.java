@@ -21,7 +21,7 @@ import com.alibaba.nacos.sys.utils.ApplicationUtils;
 
 /**
  * Instance responsibility check interceptor.
- *
+ * 判断当前的实例心跳监测任务是否由当前节点处理
  * @author gengtuo.ygt
  * on 2021/3/24
  */
@@ -32,6 +32,10 @@ public class InstanceBeatCheckResponsibleInterceptor extends AbstractBeatCheckIn
         return !ApplicationUtils.getBean(DistroMapper.class).responsible(object.getClient().getResponsibleId());
     }
 
+    /**
+     * 优先级第三高
+     * @return
+     */
     @Override
     public int order() {
         return Integer.MIN_VALUE + 2;

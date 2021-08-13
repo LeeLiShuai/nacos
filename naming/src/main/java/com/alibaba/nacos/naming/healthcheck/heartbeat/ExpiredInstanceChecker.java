@@ -36,7 +36,7 @@ import java.util.Optional;
 
 /**
  * Instance beat checker for expired instance.
- *
+ * 过期实例监测器
  * <p>Delete the instance if has expired.
  *
  * @author xiweng.yy

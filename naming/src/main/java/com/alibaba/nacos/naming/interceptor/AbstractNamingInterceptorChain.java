@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Abstract Naming Interceptor Chain.
- *
+ * 拦截链的默认实现
  * @author xiweng.yy
  */
 public abstract class AbstractNamingInterceptorChain<T extends Interceptable>
@@ -52,14 +52,21 @@ public abstract class AbstractNamingInterceptorChain<T extends Interceptable>
         interceptors.add(interceptor);
         interceptors.sort(Comparator.comparingInt(NacosNamingInterceptor::order));
     }
-    
+
+    /**
+     * 执行拦截操作
+     * @param object be interceptor object
+     */
     @Override
     public void doInterceptor(T object) {
+        //遍历拦截器
         for (NacosNamingInterceptor<T> each : interceptors) {
             if (!each.isInterceptType(object.getClass())) {
                 continue;
             }
+            //拦截
             if (each.intercept(object)) {
+                //拦截方法返回true,执行拦截后的操作
                 object.afterIntercept();
                 return;
             }

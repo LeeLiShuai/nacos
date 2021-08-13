@@ -35,29 +35,43 @@ import java.util.Optional;
 
 /**
  * Health check task for v2.x.
- *
+ * 连接状态相关的健康检查任务
  * <p>Current health check logic is same as v1.x. TODO refactor health check for v2.x.
  *
  * @author nacos
  */
 public class HealthCheckTaskV2 extends AbstractExecuteTask implements NacosHealthCheckTask {
-    
+
+    /**
+     * 客户端
+     */
     private final IpPortBasedClient client;
-    
+    /**
+     * 任务ID
+     */
     private final String taskId;
-    
+
     private final SwitchDomain switchDomain;
-    
+
+
     private final NamingMetadataManager metadataManager;
-    
+
     private long checkRtNormalized = -1;
-    
+    /**
+     * 最佳响应时间
+     */
     private long checkRtBest = -1;
-    
+    /**
+     * 最差响应时间
+     */
     private long checkRtWorst = -1;
-    
+    /**
+     * 上次响应事件
+     */
     private long checkRtLast = -1;
-    
+    /**
+     * 上上次响应事件
+     */
     private long checkRtLastLast = -1;
     
     private long startTime;
@@ -71,7 +85,10 @@ public class HealthCheckTaskV2 extends AbstractExecuteTask implements NacosHealt
         this.metadataManager = ApplicationUtils.getBean(NamingMetadataManager.class);
         initCheckRT();
     }
-    
+
+    /**
+     * 初始化响应时间值
+     */
     private void initCheckRT() {
         // first check time delay
         checkRtNormalized =
@@ -88,7 +105,10 @@ public class HealthCheckTaskV2 extends AbstractExecuteTask implements NacosHealt
     public String getTaskId() {
         return taskId;
     }
-    
+
+    /**
+     * 线程执行的逻辑
+     */
     @Override
     public void doHealthCheck() {
         try {
@@ -124,19 +144,28 @@ public class HealthCheckTaskV2 extends AbstractExecuteTask implements NacosHealt
             }
         }
     }
-    
+
+    /**
+     * 没被拦截时执行健康检查
+     */
     @Override
     public void passIntercept() {
         doHealthCheck();
     }
-    
+
+    /**
+     * 被拦截，执行完intercept之后，放入线程池等待下次执行
+     */
     @Override
     public void afterIntercept() {
         if (!cancelled) {
             HealthCheckReactor.scheduleCheck(this);
         }
     }
-    
+
+    /**
+     *
+     */
     @Override
     public void run() {
         doHealthCheck();

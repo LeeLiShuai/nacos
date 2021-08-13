@@ -30,15 +30,19 @@ import java.util.Collection;
 
 /**
  * Client beat check task of service for version 2.x.
- *
+ * 客户端心跳监测接口
  * @author nkorange
  */
 public class ClientBeatCheckTaskV2 extends AbstractExecuteTask implements BeatCheckTask, NacosHealthCheckTask {
-    
+    /**
+     * 客户端
+     */
     private final IpPortBasedClient client;
     
     private final String taskId;
-    
+    /**
+     * 拦截器链
+     */
     private final InstanceBeatCheckTaskInterceptorChain interceptorChain;
     
     public ClientBeatCheckTaskV2(IpPortBasedClient client) {
@@ -64,7 +68,9 @@ public class ClientBeatCheckTaskV2 extends AbstractExecuteTask implements BeatCh
     @Override
     public void doHealthCheck() {
         try {
+            //获取所有service
             Collection<Service> services = client.getAllPublishedService();
+            //遍历服务，获取对应的InstancepublishInfo.新建心跳监测任务，交由拦截链处理
             for (Service each : services) {
                 HealthCheckInstancePublishInfo instance = (HealthCheckInstancePublishInfo) client
                         .getInstancePublishInfo(each);

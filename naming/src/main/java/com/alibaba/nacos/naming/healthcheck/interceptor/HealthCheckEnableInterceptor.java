@@ -23,7 +23,7 @@ import com.alibaba.nacos.sys.utils.ApplicationUtils;
 
 /**
  * Health check enable interceptor.
- *
+ * 判断是否开启健康监测的拦截器，如果没有开启，后续的拦截器不会执行
  * @author xiweng.yy
  */
 public class HealthCheckEnableInterceptor extends AbstractHealthCheckInterceptor {
@@ -37,7 +37,11 @@ public class HealthCheckEnableInterceptor extends AbstractHealthCheckInterceptor
             return true;
         }
     }
-    
+
+    /**
+     * 优先级最高
+     * @return
+     */
     @Override
     public int order() {
         return Integer.MIN_VALUE;

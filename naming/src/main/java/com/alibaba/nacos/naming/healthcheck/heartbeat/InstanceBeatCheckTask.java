@@ -27,19 +27,28 @@ import java.util.List;
 
 /**
  * Instance beat check task.
- *
+ * 实例心跳监测任务
  * @author xiweng.yy
  */
 public class InstanceBeatCheckTask implements Interceptable {
     
     private static final List<InstanceBeatChecker> CHECKERS = new LinkedList<>();
-    
+
+    /**
+     * 客户端
+     */
     private final IpPortBasedClient client;
-    
+
+    /**
+     * 对应的service
+     */
     private final Service service;
     
     private final HealthCheckInstancePublishInfo instancePublishInfo;
-    
+
+    /**
+     * 初始化检测器
+     */
     static {
         CHECKERS.add(new UnhealthyInstanceChecker());
         CHECKERS.add(new ExpiredInstanceChecker());
@@ -51,9 +60,10 @@ public class InstanceBeatCheckTask implements Interceptable {
         this.service = service;
         this.instancePublishInfo = instancePublishInfo;
     }
-    
+
     @Override
     public void passIntercept() {
+        //未被拦截时，执行自身检测器的方法
         for (InstanceBeatChecker each : CHECKERS) {
             each.doCheck(client, service, instancePublishInfo);
         }

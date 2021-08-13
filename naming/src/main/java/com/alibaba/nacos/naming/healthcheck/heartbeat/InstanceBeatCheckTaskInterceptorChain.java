@@ -20,7 +20,7 @@ import com.alibaba.nacos.naming.interceptor.AbstractNamingInterceptorChain;
 
 /**
  * Instance beat check interceptor chain.
- *
+ * 实例心跳监测拦截链
  * @author xiweng.yy
  */
 public class InstanceBeatCheckTaskInterceptorChain extends AbstractNamingInterceptorChain<InstanceBeatCheckTask> {

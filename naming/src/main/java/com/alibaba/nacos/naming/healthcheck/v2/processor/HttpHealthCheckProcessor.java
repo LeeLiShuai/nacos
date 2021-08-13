@@ -41,8 +41,8 @@ import java.util.Map;
 import static com.alibaba.nacos.naming.misc.Loggers.SRV_LOG;
 
 /**
- * TCP health check processor for v2.x.
- *
+ * HTTP health check processor for v2.x.
+ * http方式的心跳检查处理器
  * <p>Current health check logic is same as v1.x. TODO refactor health check for v2.x.
  *
  * @author xiweng.yy

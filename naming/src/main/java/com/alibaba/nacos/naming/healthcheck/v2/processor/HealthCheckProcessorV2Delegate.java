@@ -31,12 +31,13 @@ import java.util.stream.Collectors;
 
 /**
  * Delegate of health check v2.x.
- *
+ * v2健康检查处理器代理
  * @author nacos
  */
 @Component("healthCheckDelegateV2")
 public class HealthCheckProcessorV2Delegate implements HealthCheckProcessorV2 {
-    
+
+    //处理器集合
     private final Map<String, HealthCheckProcessorV2> healthCheckProcessorMap = new HashMap<>();
     
     public HealthCheckProcessorV2Delegate(HealthCheckExtendProvider provider) {

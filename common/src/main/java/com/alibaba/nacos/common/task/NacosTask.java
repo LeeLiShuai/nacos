@@ -18,14 +18,14 @@ package com.alibaba.nacos.common.task;
 
 /**
  * Nacos task.
- *
+ * nacos任务接口
  * @author xiweng.yy
  */
 public interface NacosTask {
     
     /**
      * Judge Whether this nacos task should do.
-     *
+     * 是否要执行
      * @return true means the nacos task should be done, otherwise false
      */
     boolean shouldProcess();

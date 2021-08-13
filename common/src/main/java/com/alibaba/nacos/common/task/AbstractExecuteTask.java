@@ -18,7 +18,7 @@ package com.alibaba.nacos.common.task;
 
 /**
  * Abstract task which should be executed immediately.
- *
+ * 需要立即执行的任务
  * @author xiweng.yy
  */
 public abstract class AbstractExecuteTask implements NacosTask, Runnable {
