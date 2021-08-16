@@ -318,41 +318,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>.editorconfig</exclude>
-                        <exclude>.travis.yml</exclude>
-                        <exclude>CONTRIBUTING.md</exclude>
-                        <exclude>CODE_OF_CONDUCT.md</exclude>
-                        <exclude>CHANGELOG.md</exclude>
-                        <exclude>style/codeStyle.md</exclude>
-                        <exclude>REPORTING-BUGS.md</exclude>
-                        <exclude>README.md</exclude>
-                        <exclude>.github/**/*</exclude>
-                        <exclude>doc/*</exclude>
-                        <exclude>derby.log</exclude>
-                        <exclude>logs/*</exclude>
-                        <exclude>src/main/resources/static/**</exclude>
-                        <exclude>**/istio/model/**</exclude>
-                        <exclude>**/consistency/entity/**</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/*.factories</exclude>
-                        <exclude>/console-ui/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven-resources-plugin.version}</version>
                 <configuration>
