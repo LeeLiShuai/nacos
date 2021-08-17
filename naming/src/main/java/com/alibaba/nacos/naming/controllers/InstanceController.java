@@ -465,10 +465,9 @@ public class InstanceController {
     @PutMapping("/beat")
     @Secured(parser = NamingResourceParser.class, action = ActionTypes.WRITE)
     public ObjectNode beat(HttpServletRequest request) throws Exception {
-
+        //构建心跳信息
         ObjectNode result = JacksonUtils.createEmptyJsonNode();
         result.put(SwitchEntry.CLIENT_BEAT_INTERVAL, switchDomain.getClientBeatInterval());
-
         String beat = WebUtils.optional(request, "beat", StringUtils.EMPTY);
         RsInfo clientBeat = null;
         if (StringUtils.isNotBlank(beat)) {
@@ -493,7 +492,7 @@ public class InstanceController {
         NamingUtils.checkServiceNameFormat(serviceName);
         Loggers.SRV_LOG.debug("[CLIENT-BEAT] full arguments: beat: {}, serviceName: {}", clientBeat, serviceName);
         Instance instance = serviceManager.getInstance(namespaceId, serviceName, clusterName, ip, port);
-
+        //对应的实例不存在
         if (instance == null) {
             if (clientBeat == null) {
                 result.put(CommonParams.CODE, NamingResponseCode.RESOURCE_NOT_FOUND);
@@ -512,7 +511,7 @@ public class InstanceController {
             instance.setServiceName(serviceName);
             instance.setInstanceId(instance.getInstanceId());
             instance.setEphemeral(clientBeat.isEphemeral());
-
+            //新建实例，同注册
             serviceManager.registerInstance(namespaceId, serviceName, instance);
         }
 
