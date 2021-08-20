@@ -26,25 +26,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Health check status.
- *
+ * 健康检查状态
  * @author nacos
  */
 public class HealthCheckStatus {
-    
+    /**
+     * 是否已检查
+     */
     public AtomicBoolean isBeingChecked = new AtomicBoolean(false);
-    
+    /**
+     * 检查失败的次数
+     */
     public AtomicInteger checkFailCount = new AtomicInteger(0);
-    
+    /**
+     * 检查成功的次数
+     */
     public AtomicInteger checkOkCount = new AtomicInteger(0);
-    
+
     public long checkRt = -1L;
-    
+
     private static ConcurrentMap<String, HealthCheckStatus> statusMap = new ConcurrentHashMap<>();
-    
+
     public static void reset(Instance instance) {
         statusMap.put(buildKey(instance), new HealthCheckStatus());
     }
-    
+
     /**
      * Get health check status of instance.
      *
@@ -53,21 +59,21 @@ public class HealthCheckStatus {
      */
     public static HealthCheckStatus get(Instance instance) {
         String key = buildKey(instance);
-        
+
         if (!statusMap.containsKey(key)) {
             statusMap.putIfAbsent(key, new HealthCheckStatus());
         }
-        
+
         return statusMap.get(key);
     }
-    
+
     public static void remv(Instance instance) {
         statusMap.remove(buildKey(instance));
     }
-    
+
     private static String buildKey(Instance instance) {
         try {
-            
+
             String clusterName = instance.getClusterName();
             String serviceName = instance.getServiceName();
             String datumKey = instance.getDatumKey();
@@ -75,7 +81,7 @@ public class HealthCheckStatus {
         } catch (Throwable e) {
             Loggers.SRV_LOG.error("[BUILD-KEY] Exception while set rt, ip {}, error: {}", instance.toJson(), e);
         }
-        
+
         return instance.getDefaultKey();
     }
 }

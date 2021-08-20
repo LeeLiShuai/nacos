@@ -18,18 +18,18 @@ package com.alibaba.nacos.naming.healthcheck;
 
 /**
  * Health check processor.
- *
+ * 健康检查处理器
  * @author nkorange
  */
 public interface HealthCheckProcessor {
-    
+
     /**
      * Run check task for service.
      *
      * @param task check task
      */
     void process(HealthCheckTask task);
-    
+
     /**
      * Get check task type, refer to enum HealthCheckType.
      *

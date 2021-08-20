@@ -49,59 +49,59 @@ import static com.alibaba.nacos.naming.misc.Loggers.SRV_LOG;
 @Component
 @SuppressWarnings("PMD.ThreadPoolCreationRule")
 public class MysqlHealthCheckProcessor implements HealthCheckProcessor {
-    
+
     public static final String TYPE = "MYSQL";
-    
+
     @Autowired
     private HealthCheckCommon healthCheckCommon;
-    
+
     @Autowired
     private SwitchDomain switchDomain;
-    
+
     public static final int CONNECT_TIMEOUT_MS = 500;
-    
+
     private static final String CHECK_MYSQL_MASTER_SQL = "show global variables where variable_name='read_only'";
-    
+
     private static final String MYSQL_SLAVE_READONLY = "ON";
-    
+
     private static final ConcurrentMap<String, Connection> CONNECTION_POOL = new ConcurrentHashMap<String, Connection>();
-    
+
     public MysqlHealthCheckProcessor() {
     }
-    
+
     @Override
     public String getType() {
         return TYPE;
     }
-    
+
     @Override
     public void process(HealthCheckTask task) {
         List<Instance> ips = task.getCluster().allIPs(false);
-        
+
         SRV_LOG.debug("mysql check, ips:" + ips);
         if (CollectionUtils.isEmpty(ips)) {
             return;
         }
-        
+
         for (Instance ip : ips) {
             try {
-                
+
                 if (ip.isMarked()) {
                     if (SRV_LOG.isDebugEnabled()) {
                         SRV_LOG.debug("mysql check, ip is marked as to skip health check, ip: {}", ip.getIp());
                     }
                     continue;
                 }
-                
+
                 if (!ip.markChecking()) {
                     SRV_LOG.warn("mysql check started before last one finished, service: {}:{}:{}",
                             task.getCluster().getService().getName(), task.getCluster().getName(), ip.getIp());
-                    
+
                     healthCheckCommon.reEvaluateCheckRT(task.getCheckRtNormalized() * 2, task,
                             switchDomain.getMysqlHealthParams());
                     continue;
                 }
-                
+
                 GlobalExecutor.executeMysqlCheckTask(new MysqlCheckTask(ip, task));
                 MetricsMonitor.getMysqlHealthCheckMonitor().incrementAndGet();
             } catch (Exception e) {
@@ -112,34 +112,36 @@ public class MysqlHealthCheckProcessor implements HealthCheckProcessor {
             }
         }
     }
-    
+
+    /**
+     * mysql健康检查任务
+     */
     private class MysqlCheckTask implements Runnable {
-        
+
         private Instance ip;
-        
+
         private HealthCheckTask task;
-        
+
         private long startTime = System.currentTimeMillis();
-        
+
         public MysqlCheckTask(Instance ip, HealthCheckTask task) {
             this.ip = ip;
             this.task = task;
         }
-        
+
         @Override
         public void run() {
-            
+            //sql语句
             Statement statement = null;
+            //结果
             ResultSet resultSet = null;
-            
             try {
-                
                 Cluster cluster = task.getCluster();
                 String key = cluster.getService().getName() + ":" + cluster.getName() + ":" + ip.getIp() + ":" + ip
                         .getPort();
                 Connection connection = CONNECTION_POOL.get(key);
                 Mysql config = (Mysql) cluster.getHealthChecker();
-                
+
                 if (connection == null || connection.isClosed()) {
                     String url =
                             "jdbc:mysql://" + ip.getIp() + ":" + ip.getPort() + "?connectTimeout=" + CONNECT_TIMEOUT_MS
@@ -147,20 +149,20 @@ public class MysqlHealthCheckProcessor implements HealthCheckProcessor {
                     connection = DriverManager.getConnection(url, config.getUser(), config.getPwd());
                     CONNECTION_POOL.put(key, connection);
                 }
-                
+
                 statement = connection.createStatement();
                 statement.setQueryTimeout(1);
-                
+
                 resultSet = statement.executeQuery(config.getCmd());
                 int resultColumnIndex = 2;
-                
+
                 if (CHECK_MYSQL_MASTER_SQL.equals(config.getCmd())) {
                     resultSet.next();
                     if (MYSQL_SLAVE_READONLY.equals(resultSet.getString(resultColumnIndex))) {
                         throw new IllegalStateException("current node is slave!");
                     }
                 }
-                
+
                 healthCheckCommon.checkOK(ip, task, "mysql:+ok");
                 healthCheckCommon.reEvaluateCheckRT(System.currentTimeMillis() - startTime, task,
                         switchDomain.getMysqlHealthParams());
@@ -175,16 +177,16 @@ public class MysqlHealthCheckProcessor implements HealthCheckProcessor {
                 for (int deepth = 0; deepth < maxStackDepth && cause != null; deepth++) {
                     if (cause instanceof SocketTimeoutException || cause instanceof ConnectTimeoutException
                             || cause instanceof TimeoutException || cause.getCause() instanceof TimeoutException) {
-                        
+
                         healthCheckCommon.checkFail(ip, task, "mysql:timeout:" + cause.getMessage());
                         healthCheckCommon.reEvaluateCheckRT(task.getCheckRtNormalized() * 2, task,
                                 switchDomain.getMysqlHealthParams());
                         return;
                     }
-                    
+
                     cause = cause.getCause();
                 }
-                
+
                 // connection error, probably not reachable
                 healthCheckCommon.checkFail(ip, task, "mysql:error:" + t.getMessage());
                 healthCheckCommon.reEvaluateCheckRT(switchDomain.getMysqlHealthParams().getMax(), task,

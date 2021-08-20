@@ -26,17 +26,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Health check reactor.
- *
+ * 健康检查执行器
  * @author nacos
  */
 @SuppressWarnings("PMD.ThreadPoolCreationRule")
 public class HealthCheckReactor {
-    
+
     private static Map<String, ScheduledFuture> futureMap = new ConcurrentHashMap<>();
-    
+
     /**
      * Schedule health check task.
-     *
+     * 执行健康检查
      * @param task health check task
      * @return scheduled future
      */
@@ -44,20 +44,20 @@ public class HealthCheckReactor {
         task.setStartTime(System.currentTimeMillis());
         return GlobalExecutor.scheduleNamingHealth(task, task.getCheckRtNormalized(), TimeUnit.MILLISECONDS);
     }
-    
+
     /**
      * Schedule client beat check task with a delay.
-     *
+     * 执行心跳检查
      * @param task client beat check task
      */
     public static void scheduleCheck(ClientBeatCheckTask task) {
         futureMap.computeIfAbsent(task.taskKey(),
                 k -> GlobalExecutor.scheduleNamingHealth(task, 5000, 5000, TimeUnit.MILLISECONDS));
     }
-    
+
     /**
      * Cancel client beat check task.
-     *
+     * 取消心跳检查
      * @param task client beat check task
      */
     public static void cancelCheck(ClientBeatCheckTask task) {
@@ -72,10 +72,10 @@ public class HealthCheckReactor {
             Loggers.EVT_LOG.error("[CANCEL-CHECK] cancel failed!", e);
         }
     }
-    
+
     /**
      * Schedule client beat check task without a delay.
-     *
+     * 立即执行
      * @param task health check task
      * @return scheduled future
      */

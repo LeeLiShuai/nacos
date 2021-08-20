@@ -55,7 +55,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A consistency protocol algorithm called <b>Distro</b>
- *
+ * AP模式下的一致性实现
  * <p>Use a distro algorithm to divide data into many blocks. Each Nacos server node takes responsibility for exactly
  * one block of data. Each block of data is generated, removed and synchronized by its responsible server. So every
  * Nacos server only handles writings for a subset of the total service data.
@@ -69,25 +69,25 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @DependsOn("ProtocolManager")
 @org.springframework.stereotype.Service("distroConsistencyService")
 public class DistroConsistencyServiceImpl implements EphemeralConsistencyService, DistroDataProcessor {
-    
+
     private final DistroMapper distroMapper;
-    
+
     private final DataStore dataStore;
-    
+
     private final Serializer serializer;
-    
+
     private final SwitchDomain switchDomain;
-    
+
     private final GlobalConfig globalConfig;
-    
+
     private final DistroProtocol distroProtocol;
-    
+
     private volatile Notifier notifier = new Notifier();
-    
+
     private Map<String, ConcurrentLinkedQueue<RecordListener>> listeners = new ConcurrentHashMap<>();
-    
+
     private Map<String, String> syncChecksumTasks = new ConcurrentHashMap<>(16);
-    
+
     public DistroConsistencyServiceImpl(DistroMapper distroMapper, DataStore dataStore, Serializer serializer,
             SwitchDomain switchDomain, GlobalConfig globalConfig, DistroProtocol distroProtocol) {
         this.distroMapper = distroMapper;
@@ -97,38 +97,44 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         this.globalConfig = globalConfig;
         this.distroProtocol = distroProtocol;
     }
-    
+
     @PostConstruct
     public void init() {
         GlobalExecutor.submitDistroNotifyTask(notifier);
     }
-    
+
+    /**
+     * 添加实例，AP新增service,instance时触发
+     * @param key   key of data, this key should be globally unique
+     * @param value value of data
+     * @throws NacosException
+     */
     @Override
     public void put(String key, Record value) throws NacosException {
         onPut(key, value);
         distroProtocol.sync(new DistroKey(key, KeyBuilder.INSTANCE_LIST_KEY_PREFIX), DataOperation.CHANGE,
                 globalConfig.getTaskDispatchPeriod() / 2);
     }
-    
+
     @Override
     public void remove(String key) throws NacosException {
         onRemove(key);
         listeners.remove(key);
     }
-    
+
     @Override
     public Datum get(String key) throws NacosException {
         return dataStore.get(key);
     }
-    
+
     /**
      * Put a new record.
-     *
+     * 新增纪录
      * @param key   key of record
      * @param value record
      */
     public void onPut(String key, Record value) {
-        
+        //临时实例
         if (KeyBuilder.matchEphemeralInstanceListKey(key)) {
             Datum<Instances> datum = new Datum<>();
             datum.value = (Instances) value;
@@ -136,30 +142,30 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
             datum.timestamp.incrementAndGet();
             dataStore.put(key, datum);
         }
-        
+
         if (!listeners.containsKey(key)) {
             return;
         }
-        
+        //添加任务
         notifier.addTask(key, DataOperation.CHANGE);
     }
-    
+
     /**
      * Remove a record.
      *
      * @param key key of record
      */
     public void onRemove(String key) {
-        
+
         dataStore.remove(key);
-        
+
         if (!listeners.containsKey(key)) {
             return;
         }
-        
+
         notifier.addTask(key, DataOperation.DELETE);
     }
-    
+
     /**
      * Check sum when receive checksums request.
      *
@@ -167,17 +173,17 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
      * @param server      source server request checksum
      */
     public void onReceiveChecksums(Map<String, String> checksumMap, String server) {
-        
+
         if (syncChecksumTasks.containsKey(server)) {
             // Already in process of this server:
             Loggers.DISTRO.warn("sync checksum task already in process with {}", server);
             return;
         }
-        
+
         syncChecksumTasks.put(server, "1");
-        
+
         try {
-            
+
             List<String> toUpdateKeys = new ArrayList<>();
             List<String> toRemoveKeys = new ArrayList<>();
             for (Map.Entry<String, String> entry : checksumMap.entrySet()) {
@@ -187,35 +193,35 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
                     // abort the procedure:
                     return;
                 }
-                
+
                 if (!dataStore.contains(entry.getKey()) || dataStore.get(entry.getKey()).value == null || !dataStore
                         .get(entry.getKey()).value.getChecksum().equals(entry.getValue())) {
                     toUpdateKeys.add(entry.getKey());
                 }
             }
-            
+
             for (String key : dataStore.keys()) {
-                
+
                 if (!server.equals(distroMapper.mapSrv(KeyBuilder.getServiceName(key)))) {
                     continue;
                 }
-                
+
                 if (!checksumMap.containsKey(key)) {
                     toRemoveKeys.add(key);
                 }
             }
-            
+
             Loggers.DISTRO
                     .info("to remove keys: {}, to update keys: {}, source: {}", toRemoveKeys, toUpdateKeys, server);
-            
+
             for (String key : toRemoveKeys) {
                 onRemove(key);
             }
-            
+
             if (toUpdateKeys.isEmpty()) {
                 return;
             }
-            
+
             try {
                 DistroHttpCombinedKey distroKey = new DistroHttpCombinedKey(KeyBuilder.INSTANCE_LIST_KEY_PREFIX,
                         server);
@@ -232,14 +238,14 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
             syncChecksumTasks.remove(server);
         }
     }
-    
+
     private boolean processData(byte[] data) throws Exception {
         if (data.length > 0) {
             Map<String, Datum<Instances>> datumMap = serializer.deserializeMap(data, Instances.class);
-            
+
             for (Map.Entry<String, Datum<Instances>> entry : datumMap.entrySet()) {
                 dataStore.put(entry.getKey(), entry.getValue());
-                
+
                 if (!listeners.containsKey(entry.getKey())) {
                     // pretty sure the service not exist:
                     if (switchDomain.isDefaultInstanceEphemeral()) {
@@ -254,7 +260,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
                         // now validate the service. if failed, exception will be thrown
                         service.setLastModifiedMillis(System.currentTimeMillis());
                         service.recalculateChecksum();
-                        
+
                         // The Listener corresponding to the key value must not be empty
                         RecordListener listener = listeners.get(KeyBuilder.SERVICE_META_KEY_PREFIX).peek();
                         if (Objects.isNull(listener)) {
@@ -264,15 +270,15 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
                     }
                 }
             }
-            
+
             for (Map.Entry<String, Datum<Instances>> entry : datumMap.entrySet()) {
-                
+
                 if (!listeners.containsKey(entry.getKey())) {
                     // Should not happen:
                     Loggers.DISTRO.warn("listener of {} not found.", entry.getKey());
                     continue;
                 }
-                
+
                 try {
                     for (RecordListener listener : listeners.get(entry.getKey())) {
                         listener.onChange(entry.getKey(), entry.getValue().value);
@@ -281,14 +287,14 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
                     Loggers.DISTRO.error("[NACOS-DISTRO] error while execute listener of key: {}", entry.getKey(), e);
                     continue;
                 }
-                
+
                 // Update data store if listener executed successfully:
                 dataStore.put(entry.getKey(), entry.getValue());
             }
         }
         return true;
     }
-    
+
     @Override
     public boolean processData(DistroData distroData) {
         DistroHttpData distroHttpData = (DistroHttpData) distroData;
@@ -296,12 +302,12 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         onPut(datum.key, datum.value);
         return true;
     }
-    
+
     @Override
     public String processType() {
         return KeyBuilder.INSTANCE_LIST_KEY_PREFIX;
     }
-    
+
     @Override
     public boolean processVerifyData(DistroData distroData) {
         DistroHttpData distroHttpData = (DistroHttpData) distroData;
@@ -310,7 +316,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         onReceiveChecksums(verifyData, sourceServer);
         return true;
     }
-    
+
     @Override
     public boolean processSnapshot(DistroData distroData) {
         try {
@@ -319,20 +325,20 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
             return false;
         }
     }
-    
+
     @Override
     public void listen(String key, RecordListener listener) throws NacosException {
         if (!listeners.containsKey(key)) {
             listeners.put(key, new ConcurrentLinkedQueue<>());
         }
-        
+
         if (listeners.get(key).contains(listener)) {
             return;
         }
-        
+
         listeners.get(key).add(listener);
     }
-    
+
     @Override
     public void unListen(String key, RecordListener listener) throws NacosException {
         if (!listeners.containsKey(key)) {
@@ -345,12 +351,12 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
             }
         }
     }
-    
+
     @Override
     public boolean isAvailable() {
         return isInitialized() || ServerStatus.UP.name().equals(switchDomain.getOverriddenServerStatus());
     }
-    
+
     @Override
     public Optional<String> getErrorMsg() {
         String errorMsg;
@@ -361,25 +367,28 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         }
         return Optional.ofNullable(errorMsg);
     }
-    
+
     public boolean isInitialized() {
         return distroProtocol.isInitialized() || !globalConfig.isDataWarmup();
     }
-    
+
+    /**
+     * 通知
+     */
     public class Notifier implements Runnable {
-        
+
         private ConcurrentHashMap<String, String> services = new ConcurrentHashMap<>(10 * 1024);
-        
+
         private BlockingQueue<Pair<String, DataOperation>> tasks = new ArrayBlockingQueue<>(1024 * 1024);
-        
+
         /**
          * Add new notify task to queue.
-         *
+         * 添加任务到queue中
          * @param datumKey data key
          * @param action   action for data
          */
         public void addTask(String datumKey, DataOperation action) {
-            
+
             if (services.containsKey(datumKey) && action == DataOperation.CHANGE) {
                 return;
             }
@@ -388,15 +397,15 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
             }
             tasks.offer(Pair.with(datumKey, action));
         }
-        
+
         public int getTaskSize() {
             return tasks.size();
         }
-        
+
         @Override
         public void run() {
             Loggers.DISTRO.info("distro notifier started");
-            
+            //不停地处理queue中的任务
             for (; ; ) {
                 try {
                     Pair<String, DataOperation> pair = tasks.take();
@@ -406,30 +415,26 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
                 }
             }
         }
-        
+
         private void handle(Pair<String, DataOperation> pair) {
             try {
                 String datumKey = pair.getValue0();
                 DataOperation action = pair.getValue1();
-                
                 services.remove(datumKey);
-                
                 int count = 0;
-                
+                //没有监听，跳过。service初始化时添加的监听
                 if (!listeners.containsKey(datumKey)) {
                     return;
                 }
-                
+                //遍历对应的所有监听器
                 for (RecordListener listener : listeners.get(datumKey)) {
-                    
                     count++;
-                    
                     try {
                         if (action == DataOperation.CHANGE) {
                             listener.onChange(datumKey, dataStore.get(datumKey).value);
                             continue;
                         }
-                        
+
                         if (action == DataOperation.DELETE) {
                             listener.onDelete(datumKey);
                             continue;
@@ -438,7 +443,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
                         Loggers.DISTRO.error("[NACOS-DISTRO] error while notifying listener of key: {}", datumKey, e);
                     }
                 }
-                
+
                 if (Loggers.DISTRO.isDebugEnabled()) {
                     Loggers.DISTRO
                             .debug("[NACOS-DISTRO] datum change notified, key: {}, listener count: {}, action: {}",
