@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Cluster.
- * 集群，service对应的实例集合
+ * 集群，service->cluster->instance
  * @author nkorange
  * @author jifengnan 2019-04-26
  */
@@ -144,8 +144,8 @@ public class Cluster extends com.alibaba.nacos.api.naming.pojo.Cluster implement
         if (inited) {
             return;
         }
+        //服务端主动健康检查
         checkTask = new HealthCheckTask(this);
-
         HealthCheckReactor.scheduleCheck(checkTask);
         inited = true;
     }

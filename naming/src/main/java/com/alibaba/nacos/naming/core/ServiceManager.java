@@ -62,7 +62,6 @@ import static com.alibaba.nacos.naming.misc.UtilsAndCommons.UPDATE_INSTANCE_META
 /**
  * Core manager storing all services in Nacos.
  * service管理器
- *
  * @author nkorange
  */
 @Component
@@ -156,7 +155,6 @@ public class ServiceManager implements RecordListener<Service> {
     /**
      * Add a service into queue to update.
      * 有service状态需要更新，将更新信息添加到queue中
-     *
      * @param namespaceId namespace
      * @param serviceName service name
      * @param serverIP    target server ip
@@ -476,7 +474,7 @@ public class ServiceManager implements RecordListener<Service> {
             service.validate();
             //存入manage中并初始化
             putServiceAndInit(service);
-            //添加service到一致性service中
+            //添加service到一致性service中，一半local为true
             if (!local) {
                 addOrReplaceService(service);
             }

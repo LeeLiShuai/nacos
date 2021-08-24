@@ -112,6 +112,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
     @Override
     public void put(String key, Record value) throws NacosException {
         onPut(key, value);
+        //添加同步请求
         distroProtocol.sync(new DistroKey(key, KeyBuilder.INSTANCE_LIST_KEY_PREFIX), DataOperation.CHANGE,
                 globalConfig.getTaskDispatchPeriod() / 2);
     }
@@ -326,6 +327,12 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         }
     }
 
+    /**
+     * 监听service
+     * @param key      key of data
+     * @param listener callback of data change
+     * @throws NacosException
+     */
     @Override
     public void listen(String key, RecordListener listener) throws NacosException {
         if (!listeners.containsKey(key)) {

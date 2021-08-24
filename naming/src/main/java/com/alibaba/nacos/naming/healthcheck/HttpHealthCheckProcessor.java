@@ -103,7 +103,7 @@ public class HttpHealthCheckProcessor implements HealthCheckProcessor {
                 Map<String, String> customHeaders = healthChecker.getCustomHeaders();
                 Header header = Header.newInstance();
                 header.addAll(customHeaders);
-                //法功http请求
+                //http请求
                 ASYNC_REST_TEMPLATE.get(target.toString(), header, Query.EMPTY, String.class,
                         new HttpHealthCheckCallback(ip, task));
                 MetricsMonitor.getHttpHealthCheckMonitor().incrementAndGet();
