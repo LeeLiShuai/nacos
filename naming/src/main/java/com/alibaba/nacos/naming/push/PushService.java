@@ -55,7 +55,7 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  * Push service.
- * 推送服务
+ * 推送服务，某些实例状态发生变化时，推送给对应的订阅者
  * @author nacos
  */
 @Component
@@ -116,6 +116,10 @@ public class PushService implements ApplicationContextAware, ApplicationListener
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * 处理事件
+     * @param event
+     */
     @Override
     public void onApplicationEvent(ServiceChangeEvent event) {
         Service service = event.getService();

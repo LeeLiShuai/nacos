@@ -341,6 +341,7 @@ public class ServiceManager implements RecordListener<Service> {
         }
         //实例健康状态发生改变
         if (changed) {
+            //发布service变化的事件，推送给对应的订阅者，更新实例列表
             pushService.serviceChanged(service);
             if (Loggers.EVT_LOG.isDebugEnabled()) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -881,7 +882,6 @@ public class ServiceManager implements RecordListener<Service> {
     private void putServiceAndInit(Service service) throws NacosException {
         putService(service);
         service = getService(service.getNamespaceId(), service.getName());
-        //TODO
         service.init();
         consistencyService
             .listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), true), service);
