@@ -86,13 +86,13 @@ public class DistroMapper extends MemberChangeListener {
 
     /**
      * Judge whether current server is responsible for input service.
-     * 集群有响应
+     * 集群可以响应服务端主动发送的健康检查
      * @param serviceName service name
      * @return true if input service is response, otherwise false
      */
     public boolean responsible(String serviceName) {
         final List<String> servers = healthyList;
-        //开启了distro或者单机模式
+        //没开启了distro或者单机模式
         if (!switchDomain.isDistroEnabled() || EnvUtil.getStandaloneMode()) {
             return true;
         }

@@ -496,9 +496,8 @@ public class ServiceManager implements RecordListener<Service> {
     public void registerInstance(String namespaceId, String serviceName, Instance instance) throws NacosException {
         //如果service不存在就创建
         createEmptyService(namespaceId, serviceName, instance.isEphemeral());
-
+        //验证service是否存在
         Service service = getService(namespaceId, serviceName);
-
         if (service == null) {
             throw new NacosException(NacosException.INVALID_PARAM,
                 "service not found, namespace: " + namespaceId + ", service: " + serviceName);
@@ -875,11 +874,11 @@ public class ServiceManager implements RecordListener<Service> {
 
     /**
      * 将service存入manage中并初始化
-     *
      * @param service
      * @throws NacosException
      */
     private void putServiceAndInit(Service service) throws NacosException {
+        //存入serviceMap中
         putService(service);
         service = getService(service.getNamespaceId(), service.getName());
         service.init();
