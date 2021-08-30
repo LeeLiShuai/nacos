@@ -57,9 +57,6 @@ public class HealthCheckTask implements Runnable {
     @JsonIgnore
     private final SwitchDomain switchDomain;
 
-    /**
-     * 哪个类型的健康检查，sql，tcp,http
-     */
     @JsonIgnore
     private final HealthCheckProcessor healthCheckProcessor;
 

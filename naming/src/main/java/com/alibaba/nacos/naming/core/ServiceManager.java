@@ -475,7 +475,7 @@ public class ServiceManager implements RecordListener<Service> {
             service.validate();
             //存入manage中并初始化
             putServiceAndInit(service);
-            //添加service到一致性service中，一半local为true
+            //添加service到一致性service中，local==ephemeral
             if (!local) {
                 addOrReplaceService(service);
             }
@@ -629,7 +629,6 @@ public class ServiceManager implements RecordListener<Service> {
     /**
      * Add instance to service.
      * 添加实例
-     *
      * @param namespaceId namespace
      * @param serviceName service name
      * @param ephemeral   whether instance is ephemeral
@@ -881,7 +880,9 @@ public class ServiceManager implements RecordListener<Service> {
         //存入serviceMap中
         putService(service);
         service = getService(service.getNamespaceId(), service.getName());
+        //初始化，运行定时监测不健康实例任务
         service.init();
+        //一致性服务监听临时和持久化两个key
         consistencyService
             .listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), true), service);
         consistencyService

@@ -104,7 +104,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
     }
 
     /**
-     * 添加实例，AP新增service,instance时触发
+     * 添加实例，AP新增instance时触发
      * @param key   key of data, this key should be globally unique
      * @param value value of data
      * @throws NacosException
