@@ -65,7 +65,7 @@ public class HttpHealthCheckProcessor implements HealthCheckProcessor {
 
     @Override
     public void process(HealthCheckTask task) {
-        //获取集群的所有实例ip
+        //获取集群的所有持久化实例实例ip
         List<Instance> ips = task.getCluster().allIPs(false);
         if (CollectionUtils.isEmpty(ips)) {
             return;
