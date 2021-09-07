@@ -108,7 +108,7 @@ public class DistroProtocol {
 
     /**
      * Start to sync data to all remote server.
-     * 发送同步请求到所有服务节点
+     * 发送同步请求到除自己外的所有服务节点
      * @param distroKey distro key of sync data
      * @param action    the action of data operation
      */
@@ -146,7 +146,7 @@ public class DistroProtocol {
 
     /**
      * Receive synced distro data, find processor to process.
-     *
+     * 接收其他服务节点发送的同步请求
      * @param distroData Received data
      * @return true if handle receive data successfully, otherwise false
      */

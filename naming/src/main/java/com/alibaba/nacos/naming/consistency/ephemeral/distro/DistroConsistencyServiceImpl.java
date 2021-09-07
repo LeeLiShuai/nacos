@@ -84,6 +84,9 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
 
     private volatile Notifier notifier = new Notifier();
 
+    /**
+     * RecordListener:Service,ServiceManager
+     */
     private Map<String, ConcurrentLinkedQueue<RecordListener>> listeners = new ConcurrentHashMap<>();
 
     private Map<String, String> syncChecksumTasks = new ConcurrentHashMap<>(16);
@@ -296,6 +299,11 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         return true;
     }
 
+    /**
+     * 其他服务节点发送的同步请求.调用onPut方法，等同于自己的instance发生变化
+     * @param distroData received data
+     * @return
+     */
     @Override
     public boolean processData(DistroData distroData) {
         DistroHttpData distroHttpData = (DistroHttpData) distroData;
@@ -329,8 +337,11 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
 
     /**
      * 监听service
+     * key:com.alibaba.nacos.naming.domains.meta.  service元数据，serviceManager初始化时监听自己
+     * | com.alibaba.nacos.naming.iplist.ephemeral.{namespaceId}##{serviceName}  临时实例
+     * | com.alibaba.nacos.naming.iplist.{namespaceId}##{serviceName}  持久化实例
      * @param key      key of data
-     * @param listener callback of data change
+     * @param listener callback of data change  key为实例时，listener为instances.key为元数据是，listener为service
      * @throws NacosException
      */
     @Override

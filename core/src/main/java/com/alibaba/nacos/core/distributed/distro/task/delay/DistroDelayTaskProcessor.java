@@ -26,21 +26,21 @@ import com.alibaba.nacos.core.distributed.distro.task.execute.DistroSyncChangeTa
 
 /**
  * Distro delay task processor.
- *
+ * distro延迟任务执行器
  * @author xiweng.yy
  */
 public class DistroDelayTaskProcessor implements NacosTaskProcessor {
-    
+
     private final DistroTaskEngineHolder distroTaskEngineHolder;
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     public DistroDelayTaskProcessor(DistroTaskEngineHolder distroTaskEngineHolder,
             DistroComponentHolder distroComponentHolder) {
         this.distroTaskEngineHolder = distroTaskEngineHolder;
         this.distroComponentHolder = distroComponentHolder;
     }
-    
+
     @Override
     public boolean process(NacosTask task) {
         if (!(task instanceof DistroDelayTask)) {

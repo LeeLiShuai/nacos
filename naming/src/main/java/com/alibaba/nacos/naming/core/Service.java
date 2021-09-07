@@ -175,9 +175,9 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
     }
 
     /**
-     * service发生变化触发
+     * instances发生变化时触发，即新增删除实例
      * @param key   target key
-     * @param value data of the key
+     * @param value data of the key  新的实例列表
      * @throws Exception
      */
     @Override
@@ -233,7 +233,7 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
 
     /**
      * Update instances.
-     * 更新实例
+     * 更新实例ip
      * @param instances instances
      * @param ephemeral whether is ephemeral instance
      */

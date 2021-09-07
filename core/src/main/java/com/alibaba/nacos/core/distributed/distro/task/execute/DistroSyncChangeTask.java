@@ -25,18 +25,18 @@ import com.alibaba.nacos.core.utils.Loggers;
 
 /**
  * Distro sync change task.
- *
+ * 同步数据变化任务
  * @author xiweng.yy
  */
 public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     public DistroSyncChangeTask(DistroKey distroKey, DistroComponentHolder distroComponentHolder) {
         super(distroKey);
         this.distroComponentHolder = distroComponentHolder;
     }
-    
+
     @Override
     public void run() {
         Loggers.DISTRO.info("[DISTRO-START] {}", toString());
@@ -54,7 +54,7 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
             handleFailedTask();
         }
     }
-    
+
     private void handleFailedTask() {
         String type = getDistroKey().getResourceType();
         DistroFailedTaskHandler failedTaskHandler = distroComponentHolder.findFailedTaskHandler(type);
@@ -64,7 +64,7 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
         }
         failedTaskHandler.retry(getDistroKey(), DataOperation.CHANGE);
     }
-    
+
     @Override
     public String toString() {
         return "DistroSyncChangeTask for " + getDistroKey().toString();

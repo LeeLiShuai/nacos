@@ -25,7 +25,7 @@ import com.alibaba.nacos.naming.misc.GlobalConfig;
 
 /**
  * Distro http task processor.
- *
+ * 处理
  * <p>
  * The reason of create this delay task execute engine is that HTTP will establish and close tcp connection frequently,
  * so that cost more memory and cpu. What's more, there may be much 'TIME_WAIT' status tcp connection when service
@@ -39,16 +39,16 @@ import com.alibaba.nacos.naming.misc.GlobalConfig;
  * @author xiweng.yy
  */
 public class DistroHttpDelayTaskProcessor implements NacosTaskProcessor {
-    
+
     private final GlobalConfig globalConfig;
-    
+
     private final DistroTaskEngineHolder distroTaskEngineHolder;
-    
+
     public DistroHttpDelayTaskProcessor(GlobalConfig globalConfig, DistroTaskEngineHolder distroTaskEngineHolder) {
         this.globalConfig = globalConfig;
         this.distroTaskEngineHolder = distroTaskEngineHolder;
     }
-    
+
     @Override
     public boolean process(NacosTask task) {
         DistroDelayTask distroDelayTask = (DistroDelayTask) task;
